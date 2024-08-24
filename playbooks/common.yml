@@ -15,9 +15,13 @@
       apt:
         update_cache: true
 
-    - name: ensure wireshark is at the latest version
-      apt:
-        name: wireshark
-        state: latest
+  - name: Ensure Wireshark is at the latest version
+    hosts: all
+    become: yes
+    tasks:
+      - name: Ensure Wireshark is at the latest version
+        package:
+          name: wireshark
+          state: latest
 
             
