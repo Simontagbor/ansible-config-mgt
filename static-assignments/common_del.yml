@@ -1,0 +1,23 @@
+- name: update web, nfs amd db servers
+    hosts: webservers, nfs, db
+    remote_user: ec2-user
+    become: true
+    become_user: root
+    tasks:
+        - name: delete wireshark package
+        apt:
+            name: wireshark
+            state: removed
+
+- name: update LB servers
+    hosts: lb
+    remote_user: ubuntu
+    become: true
+    become_user: root
+    tasks:
+        - name: delete wireshark package
+        apt:
+            name: wireshark
+            state: absent
+            autoremoved: yes
+            autoclean: yes
