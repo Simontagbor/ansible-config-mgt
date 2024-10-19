@@ -1,0 +1,51 @@
+---
+- name: Install Jenkins
+  hosts: jenkins
+  become: true
+  pre_tasks:
+    - name: Install Java 17
+      apt:
+        name: openjdk-17-jdk
+        state: present
+
+    - name: Set JAVA_HOME for Jenkins
+      lineinfile:
+        path: /etc/default/jenkins
+        regexp: '^JAVA_HOME='
+        line: 'JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64'
+        create: yes
+
+  roles:
+    - role: geerlingguy.jenkins
+
+  post_tasks:
+    - name: Restart Jenkins
+      systemd:
+        name: jenkins
+        state: restarted
+
+- name: Gather Jenkins Logs and Status
+  hosts: jenkins
+  become: true
+  tasks:
+    - name: Check Jenkins service status
+      ansible.builtin.command: systemctl status jenkins.service
+      register: jenkins_status
+      ignore_errors: yes
+
+    - name: Print Jenkins service status
+      ansible.builtin.debug:
+        msg: "{{ jenkins_status.stdout }}"
+      tags:
+        - jenkins_status
+
+    - name: Gather Jenkins service logs
+      ansible.builtin.command: journalctl -xeu jenkins.service
+      register: jenkins_logs
+      ignore_errors: yes
+
+    - name: Print Jenkins service logs
+      ansible.builtin.debug:
+        msg: "{{ jenkins_logs.stdout }}"
+      tags:
+        - jenkins_logs
