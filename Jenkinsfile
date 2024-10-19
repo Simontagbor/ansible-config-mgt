@@ -5,14 +5,14 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building...'
-                // Add  build steps here, e.g., compile code, run build tools
+                // Add your build steps here, e.g., compile code, run build tools
                 sh 'make build' // Example build command
             }
         }
         stage('Test') {
             steps {
                 echo 'Testing...'
-                // Add test steps here, e.g., run unit tests
+                // Add your test steps here, e.g., run unit tests
                 sh 'make test' // Example test command
             }
         }
