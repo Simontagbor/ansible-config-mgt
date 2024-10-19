@@ -1,0 +1,19 @@
+---
+- name: Install and set up artifactory
+  hosts: artifactory
+  become: true
+  vars:
+    db_type: "postgresql"
+    db_driver: "org.postgresql.Driver"
+    db_url: "jdbc:postgresql://ci.db.devopstooling/artifactory"
+    db_user: "artifactory"
+    db_password: "artifactory-password"
+    server_name: "artifacts.infradev.devopstooling.site"
+    master_key: "c97b862469de0d94fbb7d48130637a5a"
+    join_key: "9bcca98f375c0728d907cc6ee39d4f02"
+    jfrog_url: "https://ci.proxy.devopstooling.site/artifactory"
+
+
+  roles:
+    - jfrog.installers.artifactory
+    - jfrog.installers.xray
