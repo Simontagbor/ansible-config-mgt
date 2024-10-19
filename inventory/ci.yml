@@ -1,0 +1,35 @@
+jenkins:
+  hosts:
+    54.89.100.23:
+      ansible_ssh_user: ubuntu
+
+
+
+sonarqube:
+  hosts:
+    98.83.26.50:
+      ansible_ssh_user: ubuntu
+
+
+artifactory:
+  hosts:
+    54.224.210.198:
+      ansible_ssh_user: ubuntu
+      
+
+nginx:
+  hosts:
+    3.92.245.109:
+      ansible_ssh_user: ubuntu
+
+
+postgresql:
+  hosts:
+    52.205.210.33:
+      ansible_ssh_user: ubuntu
+
+    
+xray:
+  hosts:
+    18.234.177.55:
+      ansible_ssh_user: ubuntu
