@@ -1,0 +1,11 @@
+---
+- name: Install and configure PostgreSQL for Artifactory and SonarQube
+  hosts: postgresql
+  become: true
+  vars:
+    postgresql_version: "16"
+    artifactory_db_password: "Admin123"
+    sonarqube_db_password: "Admin123"
+
+  roles:
+    - db

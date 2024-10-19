@@ -1,0 +1,74 @@
+---
+# Install PostgreSQL
+- name: Install PostgreSQL
+  apt:
+    name: "postgresql-{{ postgresql_version }}"
+    state: present
+    update_cache: yes
+
+# Start and enable PostgreSQL service
+- name: Start and enable PostgreSQL service
+  systemd:
+    name: postgresql
+    enabled: yes
+    state: started
+
+# Ensure the PostgreSQL service is running
+- name: Ensure PostgreSQL is running
+  service:
+    name: postgresql
+    state: started
+
+# Create a database for Artifactory
+- name: Create Artifactory database
+  become_user: postgres
+  postgresql_db:
+    name: artifactorydb
+    state: present
+
+# Create a user for Artifactory
+- name: Create Artifactory user
+  become_user: postgres
+  postgresql_user:
+    name: artifactoryuser
+    password: "{{ artifactory_db_password }}"
+    priv: "artifactorydb:ALL"
+    state: present
+
+# Create a database for SonarQube
+- name: Create SonarQube database
+  become_user: postgres
+  postgresql_db:
+    name: sonarqubedb
+    state: present
+
+# Create a user for SonarQube
+- name: Create SonarQube user
+  become_user: postgres
+  postgresql_user:
+    name: sonarqubeuser
+    password: "{{ sonarqube_db_password }}"
+    priv: "sonarqubedb:ALL"
+    state: present
+
+# Ensure PostgreSQL listens to all addresses (required for external connections)
+- name: Ensure PostgreSQL is listening to all addresses
+  lineinfile:
+    path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
+    regexp: '^#listen_addresses'
+    line: "listen_addresses = '*'"
+    state: present
+
+# Allow password authentication by updating pg_hba.conf
+- name: Allow password authentication for all hosts
+  lineinfile:
+    path: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
+    regexp: '^host.*all.*all.*127\.0\.0\.1/32.*md5'
+    line: 'host all all 0.0.0.0/0 md5'
+    state: present
+
+# Restart PostgreSQL to apply changes
+- name: Restart PostgreSQL to apply changes
+  service:
+    name: postgresql
+    state: restarted
