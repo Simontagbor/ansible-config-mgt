@@ -1,0 +1,39 @@
+---
+# roles/nginx/tasks/main.yml
+
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Start and enable Nginx
+  systemd:
+    name: nginx
+    enabled: true
+    state: started
+
+- name: Install Certbot
+  apt:
+    name: certbot
+    state: present
+    update_cache: yes
+
+- name: Install Certbot Nginx plugin
+  apt:
+    name: python3-certbot-nginx
+    state: present
+
+- name: Configure Nginx as a reverse proxy
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  notify:
+    - Restart Nginx
+
+- name: Obtain SSL certificate using Certbot (via Nginx plugin)
+  command: >
+    certbot --nginx -d {{ server_name }}
+    --non-interactive --agree-tos --email {{ email }}
+  args:
+    creates: /etc/letsencrypt/live/{{ server_name }}/fullchain.pem

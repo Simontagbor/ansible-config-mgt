@@ -1,0 +1,11 @@
+---
+# playbooks/nginx.yml
+
+- hosts: nginx
+  become: true
+  vars:
+    server_name: ci.proxy.devopstooling.site  # Override default server_name
+    domain: devopstooling.site                # Override default domain
+    email: simontagbor360@gmail.com           # Override default email for Certbot
+  roles:
+    - nginx

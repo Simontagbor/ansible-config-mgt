@@ -1,0 +1,6 @@
+---
+# roles/nginx/defaults/main.yml
+
+server_name: ci.proxy.devopstooling.site
+domain: devopstooling.site
+email: simontagbor360@gmail.com
