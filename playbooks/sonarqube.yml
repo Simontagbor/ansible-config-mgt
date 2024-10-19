@@ -1,0 +1,122 @@
+---
+- name: Install and configure the latest SonarQube
+  hosts: sonarqube
+  become: true
+  vars:
+    sonar_version: "9.9.7.96285"
+    sonar_user: "sonarqube"
+    sonar_group: "sonarqube"
+    sonar_home: "/opt/sonarqube"
+    sonar_db_user: "sonarqube_user"
+    sonar_db_password: "sonar-password"  # Use Ansible Vault to encrypt
+    sonar_db_url: "jdbc:postgresql://localhost:5432/sonarqube"
+
+  tasks:
+    - name: Install required dependencies
+      apt:
+        name:
+          - unzip
+          - openjdk-11-jdk
+          - postgresql
+          - postgresql-contrib
+        state: present
+
+    - name: Create SonarQube group
+      ansible.builtin.group:
+        name: "{{ sonar_group }}"
+        system: yes
+
+    - name: Create SonarQube user
+      ansible.builtin.user:
+        name: "{{ sonar_user }}"
+        group: "{{ sonar_group }}"
+        system: yes
+        shell: /bin/bash
+
+    - name: Create SonarQube directory
+      file:
+        path: "{{ sonar_home }}"
+        state: directory
+        owner: "{{ sonar_user }}"
+        group: "{{ sonar_group }}"
+        mode: '0755'
+
+    - name: Download SonarQube binaries
+      get_url:
+        url: "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-{{ sonar_version }}.zip"
+        dest: "/tmp/sonarqube-{{ sonar_version }}"
+
+    - name: Unarchive SonarQube
+      unarchive:
+        src: "/tmp/sonarqube-{{ sonar_version }}"
+        dest: "{{ sonar_home }}"
+        remote_src: yes
+
+    - name: Set ownership for SonarQube directory
+      file:
+        path: "{{ sonar_home }}"
+        owner: "{{ sonar_user }}"
+        group: "{{ sonar_group }}"
+        recurse: yes
+
+    - name: Configure SonarQube database properties
+      lineinfile:
+        path: "{{ sonar_home }}/conf/sonar.properties"
+        regexp: '^#?sonar.jdbc.url='
+        line: "sonar.jdbc.url={{ sonar_db_url }}"
+        create: yes
+
+    - name: Configure SonarQube JDBC username
+      lineinfile:
+        path: "{{ sonar_home }}/conf/sonar.properties"
+        regexp: '^#?sonar.jdbc.username='
+        line: "sonar.jdbc.username={{ sonar_db_user }}"
+        create: yes
+
+    - name: Configure SonarQube JDBC password
+      lineinfile:
+        path: "{{ sonar_home }}/conf/sonar.properties"
+        regexp: '^#?sonar.jdbc.password='
+        line: "sonar.jdbc.password={{ sonar_db_password }}"
+        create: yes
+
+    - name: Set limits for SonarQube process
+      lineinfile:
+        path: /etc/security/limits.conf
+        line: |
+          {{ sonar_user }} - nofile 65536
+          {{ sonar_user }} - nproc 4096
+        create: yes
+
+    - name: Create SonarQube service file
+      copy:
+        dest: /etc/systemd/system/sonarqube.service
+        content: |
+          [Unit]
+          Description=SonarQube service
+          After=network.target
+
+          [Service]
+          Type=simple
+          User={{ sonar_user }}
+          Group={{ sonar_group }}
+          ExecStart={{ sonar_home }}/bin/linux-x86-64/sonar.sh start
+          ExecStop={{ sonar_home }}/bin/linux-x86-64/sonar.sh stop
+          Restart=always
+          LimitNOFILE=65536
+          LimitNPROC=4096
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Start and enable SonarQube service
+      systemd:
+        name: sonarqube
+        enabled: true
+        state: started
+
+    - name: Open required port 9000 in the firewall
+      ufw:
+        rule: allow
+        port: "9000"
+        proto: tcp

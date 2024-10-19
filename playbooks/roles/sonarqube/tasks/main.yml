@@ -1,0 +1,28 @@
+---
+# tasks file for sonarqube
+---
+- name: Install Sonarqube
+  hosts: sonarqube
+  become: true
+  tasks:
+    - name: Install Java
+      package:
+        name: java-1.8.0-openjdk
+        state: present
+
+    - name: Add the SonarQube RPM
+      get_url:
+        url: https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-8.9.0.43852.zip
+        dest: /tmp/sonarqube-8.9.0.43852.zip
+
+    - name: Unzip the SonarQube package
+      unarchive:
+        src: /tmp/sonarqube-8.9.0.43852.zip
+        dest: /opt
+        remote_src: yes
+
+    - name: Set up Sonarqube as a service
+      systemd:
+        name: sonarqube
+        enabled: yes
+        state: started
