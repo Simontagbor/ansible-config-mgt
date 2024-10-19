@@ -1,0 +1,32 @@
+---
+# tasks file for webserver
+
+- name: Install Apache
+  become: true
+  ansible.builtin.yum:
+    name: httpd
+    state: present
+
+- name: Install Git
+  become: true
+  ansible.builtin.yum:
+    name: git
+    state: present
+
+- name: Clone a repo
+  become: true
+  ansible.builtin.git:
+    repo: https://github.com/Simontagbor/tooling.git
+    dest: /var/www/html
+    force: yes
+
+- name: Copy HTML content to one level up
+  become: true
+  ansible.builtin.command: mv /var/www/html/* /var/www/
+
+- name: Recursively remove /var/www/html/
+  become: true
+  ansible.builtin.file:
+    path: /var/www/html/
+    state: absent
+
