@@ -6,14 +6,8 @@ nfs:
 
 webservers:
   hosts:
-    172.31.23.94:
-      ansible_ssh_user: ec2-user
-
-    172.31.17.103:
-      ansible_ssh_user: ec2-user
-
-    172.31.21.54:
-      ansible_ssh_user: ec2-user
+    52.90.175.169:
+      ansible_ssh_user: ubuntu
 
 db:
   hosts:
@@ -21,7 +15,17 @@ db:
       ansible_ssh_user: ubuntu
 
 
-lb:
+reverse_proxy:
   hosts:
-    172.31.18.41:
+    52.90.175.169:
+      ansible_ssh_user: ubuntu
+
+todo_app:
+  hosts:
+    54.159.154.208:
+      ansible_ssh_user: ubuntu
+
+tooling_app:
+  hosts:
+    44.202.157.223:
       ansible_ssh_user: ubuntu

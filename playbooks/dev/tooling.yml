@@ -1,0 +1,30 @@
+---
+- name: Set up Tooling App
+  hosts: tooling_app
+  become: true
+
+  tasks:
+    - name: Install Apache
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start and enable Apache service
+      systemd:
+        name: httpd
+        enabled: yes
+        state: started
+
+    - name: Create Tooling App default page
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Tooling App</title>
+          </head>
+          <body>
+              <h1>Welcome to the Tooling App</h1>
+          </body>
+          </html>

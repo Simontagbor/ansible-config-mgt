@@ -1,0 +1,47 @@
+---
+- name: Install Nginx
+  hosts: reverse_proxy
+  become: true
+
+  vars_files:
+    - vars/nginx_vars.yml
+
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Start and enable Nginx service
+      systemd:
+        name: nginx
+        enabled: yes
+        state: started
+
+    - name: Obtain SSL certificate using Certbot (via Nginx plugin)
+      command: >
+        certbot --nginx -d {{ nginx_server_name }} -d www.{{ domain }}
+        --non-interactive --agree-tos --email {{ email }}
+      args:
+        creates: /etc/letsencrypt/live/{{ nginx_server_name }}/fullchain.pem
+
+    - name: Template main Nginx configuration
+      template:
+        src: templates/nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      notify:
+        - Reload Nginx
+
+    - name: Template reverse proxy configuration
+      template:
+        src: templates/reverse_proxy.conf.j2
+        dest: /etc/nginx/conf.d/reverse_proxy.conf
+      notify:
+        - Reload Nginx
+
+  handlers:
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded

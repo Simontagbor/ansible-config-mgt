@@ -1,0 +1,8 @@
+---
+nginx_server_name: "dev.devopstooling.site"
+domain: "devopstooling.site"
+email: "admin@example.com"
+todo_app_host: "todo.dev.devopstooling.site"
+todo_app_port: 8080
+tooling_app_host: "tooling.dev.devopstooling.site"
+tooling_app_port: 8080

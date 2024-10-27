@@ -1,0 +1,28 @@
+upstream todo_app {
+    server {{ todo_app_host }}:{{ todo_app_port }};
+}
+
+upstream tooling_app {
+    server {{ tooling_app_host }}:{{ tooling_app_port }};
+}
+
+server {
+    listen 80;
+    server_name {{ nginx_server_name }};
+
+    location /todo/ {
+        proxy_pass http://todo_app;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /tooling/ {
+        proxy_pass http://tooling_app;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

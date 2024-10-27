@@ -1,0 +1,30 @@
+---
+- name: Set up Todo App
+  hosts: todo_servers
+  become: true
+
+  tasks:
+    - name: Install Apache
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start and enable Apache service
+      systemd:
+        name: httpd
+        enabled: yes
+        state: started
+
+    - name: Create Todo App default page
+      copy:
+        dest: /var/www/html/index.html
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Todo App</title>
+          </head>
+          <body>
+              <h1>Welcome to the Todo App</h1>
+          </body>
+          </html>
