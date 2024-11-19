@@ -1,31 +1,35 @@
-nfs:
+jenkins:
   hosts:
-    172.31.40.51:
-      ansible_ssh_user: ec2-user
-
-
-webservers:
-  hosts:
-    52.90.175.169:
-      ansible_ssh_user: ubuntu
-
-db:
-  hosts:
-    172.31.26.114:
+    54.89.100.23:
       ansible_ssh_user: ubuntu
 
 
-reverse_proxy:
+
+sonarqube:
   hosts:
-    52.90.175.169:
+    98.83.26.50:
       ansible_ssh_user: ubuntu
 
-todo_app:
+
+artifactory:
   hosts:
-    54.159.154.208:
+    54.224.210.198:
+      ansible_ssh_user: ubuntu
+      
+
+nginx:
+  hosts:
+    3.88.52.249:
       ansible_ssh_user: ubuntu
 
-tooling_app:
+
+postgresql:
   hosts:
-    44.202.157.223:
+    52.205.210.33:
+      ansible_ssh_user: ubuntu
+
+    
+xray:
+  hosts:
+    18.234.177.55:
       ansible_ssh_user: ubuntu
