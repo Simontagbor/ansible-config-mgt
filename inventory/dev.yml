@@ -1,6 +1,6 @@
 jenkins:
   hosts:
-    54.89.100.23:
+    54.224.94.98:
       ansible_ssh_user: ubuntu
 
 
